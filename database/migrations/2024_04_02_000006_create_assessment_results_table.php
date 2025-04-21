@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('assessment_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('score', 5, 2);
-            $table->json('answers');
+            $table->json('answers')->nullable();//
             $table->text('feedback')->nullable();
             $table->json('ai_analysis')->nullable();
             $table->timestamp('completed_at');
