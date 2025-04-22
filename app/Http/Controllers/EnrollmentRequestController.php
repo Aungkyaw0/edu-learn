@@ -4,24 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\EnrollmentRequest;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class EnrollmentRequestController extends Controller
 {
+    use AuthorizesRequests;
+
+    public function myLearning()
+    {
+        $enrollmentRequests = EnrollmentRequest::with(['course', 'course.instructor'])
+            ->where('user_id', auth()->id())
+            ->get()
+            ->groupBy('status');
+
+        return Inertia::render('Student/MyLearning', [
+            'enrolledCourses' => $enrollmentRequests['accepted'] ?? [],
+            'pendingRequests' => $enrollmentRequests['pending'] ?? [],
+            'rejectedRequests' => $enrollmentRequests['rejected'] ?? []
+        ]);
+    }
+
     public function store(Request $request, Course $course)
     {
-        $request->validate([
-            'course_id' => 'required|exists:courses,id'
-        ]);
-
         // Check if user already has a request for this course
         $existingRequest = EnrollmentRequest::where('user_id', auth()->id())
             ->where('course_id', $course->id)
             ->first();
 
         if ($existingRequest) {
-            return back()->with('error', 'You have already requested enrollment in this course.');
+            return redirect()->route('student.my-learning')
+                ->with('error', 'You have already requested enrollment in this course.');
         }
 
         // Create new enrollment request
@@ -31,7 +46,8 @@ class EnrollmentRequestController extends Controller
             'status' => 'pending'
         ]);
 
-        return back()->with('success', 'Enrollment request sent successfully.');
+        return redirect()->route('student.my-learning')
+            ->with('success', 'Enrollment request sent successfully.');
     }
 
     public function accept(EnrollmentRequest $request)
@@ -41,6 +57,20 @@ class EnrollmentRequestController extends Controller
         $request->update([
             'status' => 'accepted'
         ]);
+
+        // Create enrollment record
+        $enrollment = Enrollment::firstOrCreate(
+            [
+                'user_id' => $request->user_id,
+                'course_id' => $request->course_id,
+            ],
+            [
+                'enrollment_date' => now(),
+                'progress_percentage' => 0,
+                'last_accessed' => now(),
+                'completion_data' => json_encode(['completed_modules' => []]),
+            ]
+        );
 
         return back()->with('success', 'Enrollment request accepted.');
     }
@@ -59,19 +89,5 @@ class EnrollmentRequestController extends Controller
         ]);
 
         return back()->with('success', 'Enrollment request rejected.');
-    }
-
-    public function myLearning()
-    {
-        $enrollmentRequests = EnrollmentRequest::with(['course', 'course.instructor'])
-            ->where('user_id', auth()->id())
-            ->get()
-            ->groupBy('status');
-
-        return Inertia::render('Student/MyLearning', [
-            'enrolledCourses' => $enrollmentRequests['accepted'] ?? [],
-            'pendingRequests' => $enrollmentRequests['pending'] ?? [],
-            'rejectedRequests' => $enrollmentRequests['rejected'] ?? []
-        ]);
     }
 } 

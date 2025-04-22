@@ -12,12 +12,21 @@ class DashboardController extends Controller
     public function index()
     {
         $courses = Course::where('instructor_id', auth()->id())
-            ->with(['category', 'modules'])
+            ->withCount(['enrolledStudents', 'pendingEnrollmentRequests'])
+            ->latest()
+            ->get();
+
+        $pendingRequests = EnrollmentRequest::with(['user', 'course'])
+            ->whereHas('course', function ($query) {
+                $query->where('instructor_id', auth()->id());
+            })
+            ->where('status', 'pending')
             ->latest()
             ->get();
 
         return Inertia::render('Instructor/Dashboard', [
             'courses' => $courses,
+            'pendingRequests' => $pendingRequests,
         ]);
     }
 

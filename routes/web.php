@@ -96,7 +96,9 @@ Route::middleware(['auth'])->group(function () {
     // Student routes
     Route::middleware(['auth', 'role:student'])->group(function () {
         Route::get('/my-learning', [EnrollmentRequestController::class, 'myLearning'])->name('student.my-learning');
-        Route::post('/courses/{course}/enroll', [EnrollmentRequestController::class, 'store'])->name('enrollment-requests.store');
+        Route::post('/enrollment-requests/{course}', [EnrollmentRequestController::class, 'store'])->name('enrollment-requests.store');
+        Route::get('/courses/{course}/learn', [CourseController::class, 'learn'])->name('student.course.learn');
+        Route::post('/courses/{course}/lessons/{lesson}/complete', [CourseController::class, 'completeLesson'])->name('student.lessons.complete');
     });
 });
 

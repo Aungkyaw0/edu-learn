@@ -71,6 +71,14 @@ class Course extends Model
     }
 
     /**
+     * Get the pending enrollment requests for the course.
+     */
+    public function pendingEnrollmentRequests(): HasMany
+    {
+        return $this->enrollmentRequests()->where('status', 'pending');
+    }
+
+    /**
      * Get the enrolled students for the course.
      */
     public function enrolledStudents(): BelongsToMany

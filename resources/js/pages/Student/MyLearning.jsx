@@ -1,8 +1,12 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, Head, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function MyLearning({ enrolledCourses, pendingRequests, rejectedRequests }) {
+    const handleStartLearning = (courseId) => {
+        router.get(route('student.course.learn', courseId));
+    };
+
     const CourseCard = ({ course, status, rejectionReason }) => (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="relative h-48">
@@ -44,12 +48,28 @@ export default function MyLearning({ enrolledCourses, pendingRequests, rejectedR
                 )}
 
                 <div className="mt-4 flex justify-end">
-                    <Link
-                        href={`/courses/${course.id}`}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                    >
-                        View Course
-                    </Link>
+                    {status === 'accepted' ? (
+                        <button
+                            onClick={() => handleStartLearning(course.id)}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                        >
+                            Start Now
+                        </button>
+                    ) : status === 'pending' ? (
+                        <button
+                            disabled
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600"
+                        >
+                            Pending Approval
+                        </button>
+                    ) : (
+                        <button
+                            disabled
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600"
+                        >
+                            Request Rejected
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -75,6 +95,8 @@ export default function MyLearning({ enrolledCourses, pendingRequests, rejectedR
 
     return (
         <AppLayout>
+            <Head title="My Learning" />
+            
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-8">My Learning</h1>

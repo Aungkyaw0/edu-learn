@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head } from '@inertiajs/react';
 
 export default function AssessmentList({ course, assessments, auth }) {
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout>
             <Head title={`Assessments - ${course.title}`} />
 
             <div className="py-12">
@@ -92,6 +92,6 @@ export default function AssessmentList({ course, assessments, auth }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 } 
