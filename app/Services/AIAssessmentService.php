@@ -35,7 +35,7 @@ class AIAssessmentService
                         'content' => [
                             [
                                 'type' => 'text',
-                                'text' => "Generate 10 multiple choice questions with options and correct answers based on the following course content. Return only a JSON array without any additional text. Each question should have a 'options' array with 4 choices, 'question' field, and 'correct_answer' field with the correct answer: {$courseContent}"
+                                'text' => "Generate 10 multiple choice questions with options and correct answers based on the following course content. Return only a JSON array without any additional text. Each question should have a 'options' array with 4 choices, 'question' field, and 'correct_answer' field with the idex of correct answer from the options array : {$courseContent}"
                             ]
                         ]
                     ]

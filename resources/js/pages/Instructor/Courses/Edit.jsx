@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { useForm, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import { InputLabel, TextInput, InputError } from "@/Components/Forms";
 import ModuleModal from '@/Components/Modals/ModuleModal';
 import LessonModal from '@/Components/Modals/LessonModal';
 import AssessmentModal from '@/Components/AssessmentModal';
-import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import CourseModal from '@/Components/Modals/CourseModal';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function EditCourse({ course }) {
-    const [selectedImage, setSelectedImage] = useState(course.thumbnail || null);
+    const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
     const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
     const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
     const [selectedModule, setSelectedModule] = useState(null);
@@ -18,72 +18,10 @@ export default function EditCourse({ course }) {
     const [editingAssessment, setEditingAssessment] = useState(null);
     const [generatingAssessment, setGeneratingAssessment] = useState(false);
 
-
-    const { data, setData, post, put, processing, errors } = useForm({
-        title: course.title || '',
-        description: course.description || '',
-        category: course.category || '',
-        thumbnail: null,
-        learning_outcomes: course.learning_outcomes || [''],
-        difficulty_level: course.difficulty_level || 'beginner',
-        duration: course.duration || '',
-        price: course.price || '',
-        is_published: course.is_published || false,
-        _method: 'POST'
-    });
-
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-        
-    //     // Create FormData object
-    //     const formData = new FormData();
-        
-    //     // Append all form fields to FormData
-    //     Object.keys(data).forEach(key => {
-    //         if (key === 'learning_outcomes') {
-    //             // Handle array data
-    //             data[key].forEach((outcome, index) => {
-    //                 formData.append(`learning_outcomes[${index}]`, outcome);
-    //             });
-    //         } else if (key === 'thumbnail' && data[key] === null) {
-    //             // Don't append thumbnail if it hasn't changed
-    //             return;
-    //         } else {
-    //             formData.append(key, data[key]);
-    //         }
-    //     });
-
-    //     post(route('instructor.courses.update', course.id), {
-    //         data: formData,
-    //         forceFormData: true,
-    //         onSuccess: () => {
-    //             router.visit(route('instructor.courses.index'));
-    //         },
-    //         preserveFiles: true,
-    //     });
-    // };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedImage(URL.createObjectURL(file));
-            setData('thumbnail', file);
+    const handleDeleteCourse = () => {
+        if (confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+            router.delete(route('instructor.courses.destroy', course.id));
         }
-    };
-
-    const addLearningOutcome = () => {
-        setData('learning_outcomes', [...data.learning_outcomes, '']);
-    };
-
-    const removeLearningOutcome = (index) => {
-        const newOutcomes = data.learning_outcomes.filter((_, i) => i !== index);
-        setData('learning_outcomes', newOutcomes);
-    };
-
-    const updateLearningOutcome = (index, value) => {
-        const newOutcomes = [...data.learning_outcomes];
-        newOutcomes[index] = value;
-        setData('learning_outcomes', newOutcomes);
     };
 
     const openModuleModal = (module = null) => {
@@ -156,9 +94,8 @@ export default function EditCourse({ course }) {
         }
         if (confirm('Are you sure you want to generate an AI assessment for this course? This cannot be undone.')) {
             setGeneratingAssessment(true);
-            post(route('instructor.assessment.generate', course.id), {}, {
+            router.post(route('instructor.assessment.generate', course.id), {}, {
                 onSuccess: () => {
-                    alert('Success');
                     setGeneratingAssessment(false);
                     window.location.reload();
                 },
@@ -172,12 +109,100 @@ export default function EditCourse({ course }) {
 
     return (
         <AppLayout>
-            <div className="py-12 text-black">
+            <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    {/* Course Information Section */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg text-gray-800">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            <h2 className="text-2xl font-semibold mb-6">Edit Course: {course.title}</h2>
-                            
+                            <div className="flex justify-between items-start mb-6">
+                                <h2 className="text-2xl font-semibold">Course Information</h2>
+                                <div className="flex space-x-4">
+                                    <button
+                                        onClick={() => setIsCourseModalOpen(true)}
+                                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700"
+                                    >
+                                        <PencilIcon className="h-4 w-4 mr-2" />
+                                        Edit Course
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteCourse}
+                                        className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700"
+                                    >
+                                        <TrashIcon className="h-4 w-4 mr-2" />
+                                        Delete Course
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 className="text-lg font-medium mb-2">Basic Information</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Title</h4>
+                                            <p className="mt-1">{course.title}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Description</h4>
+                                            <p className="mt-1">{course.description}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Category</h4>
+                                            <p className="mt-1">{course.category}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Difficulty Level</h4>
+                                            <p className="mt-1 capitalize">{course.difficulty_level}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg font-medium mb-2">Additional Details</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Duration</h4>
+                                            <p className="mt-1">{course.duration} hours</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Price</h4>
+                                            <p className="mt-1">${course.price}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-500">Status</h4>
+                                            <p className="mt-1">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                    course.is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                    {course.is_published ? 'Published' : 'Draft'}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {course.thumbnail && (
+                                <div className="mt-6">
+                                    <h3 className="text-lg font-medium mb-2">Thumbnail</h3>
+                                    <img
+                                        src={course.thumbnail}
+                                        alt="Course thumbnail"
+                                        className="w-48 h-32 object-cover rounded-lg"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="mt-6">
+                                <h3 className="text-lg font-medium mb-2">Learning Outcomes</h3>
+                                <ul className="list-disc list-inside space-y-1">
+                                    {course.learning_outcomes?.map((outcome, index) => (
+                                        <li key={index} className="text-gray-600">{outcome}</li>
+                                    )) || (
+                                        <li className="text-gray-500">No learning outcomes defined</li>
+                                    )}
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -266,7 +291,7 @@ export default function EditCourse({ course }) {
                         </div>
                     </div>
 
-                    {/* Assessment Section - Moved outside the form */}
+                    {/* Assessment Section */}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6">
                         <div className="p-6">
                             <div className="flex justify-between items-center">
@@ -325,6 +350,11 @@ export default function EditCourse({ course }) {
             </div>
 
             {/* Modals */}
+            <CourseModal
+                show={isCourseModalOpen}
+                onClose={() => setIsCourseModalOpen(false)}
+                course={course}
+            />
             <ModuleModal
                 isOpen={isModuleModalOpen}
                 onClose={closeModuleModal}

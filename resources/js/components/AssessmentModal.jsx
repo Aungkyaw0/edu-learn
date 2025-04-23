@@ -76,6 +76,7 @@ export default function AssessmentModal({ show, onClose, course, assessment = nu
         };
         setData('questions', newQuestions);
     };
+    console.log(data.questions);
 
     return (
         <Modal isOpen={show} onClose={onClose}>
