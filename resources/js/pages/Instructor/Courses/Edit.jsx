@@ -4,6 +4,8 @@ import AppLayout from '@/Layouts/AppLayout';
 import { InputLabel, TextInput, InputError } from "@/Components/Forms";
 import ModuleModal from '@/Components/Modals/ModuleModal';
 import LessonModal from '@/Components/Modals/LessonModal';
+import AssessmentModal from '@/Components/AssessmentModal';
+import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function EditCourse({ course }) {
     const [selectedImage, setSelectedImage] = useState(course.thumbnail || null);
@@ -12,6 +14,8 @@ export default function EditCourse({ course }) {
     const [selectedModule, setSelectedModule] = useState(null);
     const [selectedLesson, setSelectedLesson] = useState(null);
     const [currentModuleForLesson, setCurrentModuleForLesson] = useState(null);
+    const [showAssessmentModal, setShowAssessmentModal] = useState(false);
+    const [editingAssessment, setEditingAssessment] = useState(null);
 
     const { data, setData, post, put, processing, errors } = useForm({
         title: course.title || '',
@@ -119,6 +123,22 @@ export default function EditCourse({ course }) {
             router.delete(route('instructor.lessons.destroy', lessonId), {
                 preserveScroll: true,
             });
+        }
+    };
+
+    const handleCreateAssessment = () => {
+        setEditingAssessment(null);
+        setShowAssessmentModal(true);
+    };
+
+    const handleEditAssessment = (assessment) => {
+        setEditingAssessment(assessment);
+        setShowAssessmentModal(true);
+    };
+
+    const handleDeleteAssessment = () => {
+        if (confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
+            router.delete(route('courses.assessments.destroy', [course.id, course.assessment.id]));
         }
     };
 
@@ -381,6 +401,60 @@ export default function EditCourse({ course }) {
                             )}
                         </div>
                     </div>
+
+                    {/* Assessment Section */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-semibold text-gray-900">Final Assessment</h2>
+                                {!course.assessment ? (
+                                    <button
+                                        onClick={handleCreateAssessment}
+                                        className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    >
+                                        <PlusIcon className="w-4 h-4 mr-2" />
+                                        Create Assessment
+                                    </button>
+                                ) : (
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => handleEditAssessment(course.assessment)}
+                                            className="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        >
+                                            <PencilIcon className="w-4 h-4 mr-2" />
+                                            Edit Assessment
+                                        </button>
+                                        <button
+                                            onClick={handleDeleteAssessment}
+                                            className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        >
+                                            <TrashIcon className="w-4 h-4 mr-2" />
+                                            Delete Assessment
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {course.assessment ? (
+                                <div className="border-t pt-4">
+                                    <h3 className="font-medium text-lg mb-2">{course.assessment.title}</h3>
+                                    <p className="text-gray-600 mb-4">{course.assessment.description}</p>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <h4 className="font-medium mb-2">Assessment Details:</h4>
+                                        <ul className="list-disc list-inside text-gray-600 space-y-1">
+                                            <li>10 Multiple Choice Questions</li>
+                                            <li>Passing Score: 8/10</li>
+                                            <li>No time limit</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-gray-600">
+                                    No assessment has been created for this course yet. Create one to test your students' knowledge.
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -399,6 +473,15 @@ export default function EditCourse({ course }) {
                     lesson={selectedLesson}
                 />
             )}
+            <AssessmentModal
+                show={showAssessmentModal}
+                onClose={() => {
+                    setShowAssessmentModal(false);
+                    setEditingAssessment(null);
+                }}
+                course={course}
+                assessment={editingAssessment}
+            />
         </AppLayout>
     );
 } 

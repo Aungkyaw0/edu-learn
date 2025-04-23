@@ -1,5 +1,6 @@
 import LoginModal from '@/Components/Auth/LoginModal';
 import RegisterModal from '@/Components/Auth/RegisterModal';
+import FlashMessage from '@/Components/FlashMessage';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -83,7 +84,10 @@ export default function AppLayout({ children }) {
                 </div>
             </nav>
 
-            <main>{children}</main>
+            <main>
+                <FlashMessage />
+                {children}
+            </main>
 
             <LoginModal
                 isOpen={isLoginModalOpen}

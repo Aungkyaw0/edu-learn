@@ -11,6 +11,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\EnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\Assessment;
+
 
 class CourseController extends Controller
 {
@@ -41,7 +43,7 @@ class CourseController extends Controller
         }
 
         return Inertia::render('Courses/Show', [
-            'course' => $course->load(['instructor', 'modules']),
+            'course' => $course->load(['instructor', 'modules', 'assessment']),
             'enrollmentStatus' => $enrollmentStatus,
         ]);
     }
@@ -96,7 +98,7 @@ class CourseController extends Controller
         $this->authorize('update', $course);
 
         $course->load(['modules.lessons']);
-
+        $course->load(['assessment']);
         return Inertia::render('Instructor/Courses/Edit', [
             'course' => $course
         ]);
@@ -162,12 +164,16 @@ class CourseController extends Controller
                 ->with('error', 'You are not enrolled in this course.');
         }
 
+        // Get the assessment for this course
+        $assessment = Assessment::where('course_id', $course->id)->first();
+
         // Update last accessed time
         $enrollment->update(['last_accessed' => now()]);
 
         return Inertia::render('Student/Course/Learn', [
-            'course' => $course->load(['modules.lessons', 'instructor']),
+            'course' => $course->load(['modules.lessons', 'instructor', 'assessment']),
             'enrollment' => $enrollment,
+            'assessment' => $assessment,
         ]);
     }
 
@@ -216,5 +222,14 @@ class CourseController extends Controller
         }
 
         return back()->with('success', 'Lesson marked as completed.');
+    }
+
+    public function instructorShow(Course $course)
+    {
+        $this->authorize('update', $course);
+
+        return Inertia::render('Instructor/Courses/Show', [
+            'course' => $course->load(['modules', 'assessment']),
+        ]);
     }
 } 

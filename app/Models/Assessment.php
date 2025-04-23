@@ -15,19 +15,15 @@ class Assessment extends Model
         'course_id',
         'title',
         'description',
-        'question_bank',
-        'time_limit',
+        'questions',
         'passing_score',
         'is_published',
-        'metadata',
     ];
 
     protected $casts = [
-        'question_bank' => 'array',
+        'questions' => 'array',
         'is_published' => 'boolean',
-        'time_limit' => 'integer',
         'passing_score' => 'integer',
-        'metadata' => 'json',
     ];
 
     // Relationships
@@ -41,53 +37,40 @@ class Assessment extends Model
         return $this->hasMany(AssessmentResult::class);
     }
 
-    // Scopes
-    public function scopePublished($query)
-    {
-        return $query->where('is_published', true);
-    }
-
     // Helper Methods
-    public function getTotalPointsAttribute(): int
+    public function calculateScore(array $answers): int
     {
-        return collect($this->question_bank)->sum('points');
+        $correctAnswers = 0;
+        foreach ($this->questions as $index => $question) {
+            if (isset($answers[$index]) && $answers[$index] === $question['correct_answer']) {
+                $correctAnswers++;
+            }
+        }
+        return $correctAnswers;
     }
 
-    public function getQuestionCountAttribute(): int
+    public function isPassing(int $score): bool
     {
-        return count($this->question_bank);
+        return $score >= $this->passing_score;
     }
 
-    public function getAverageScoreAttribute(): float
+    public function validateQuestions(): bool
     {
-        if ($this->results->isEmpty()) {
-            return 0;
+        if (!is_array($this->questions) || count($this->questions) !== 10) {
+            return false;
         }
 
-        return $this->results->avg('score');
-    }
-
-    public function getPassingRateAttribute(): float
-    {
-        if ($this->results->isEmpty()) {
-            return 0;
+        foreach ($this->questions as $question) {
+            if (!isset($question['question']) || 
+                !isset($question['options']) || 
+                !isset($question['correct_answer']) || 
+                !is_array($question['options']) || 
+                count($question['options']) !== 4 || 
+                !in_array($question['correct_answer'], [0, 1, 2, 3])) {
+                return false;
+            }
         }
 
-        $passingCount = $this->results->where('score', '>=', $this->passing_score)->count();
-        return ($passingCount / $this->results->count()) * 100;
-    }
-
-    public function getTimeLimitInMinutes()
-    {
-        return $this->time_limit ?? 0;
-    }
-
-    public function getQuestionTypes()
-    {
-        return collect($this->question_bank)
-            ->pluck('type')
-            ->unique()
-            ->values()
-            ->toArray();
+        return true;
     }
 } 

@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnrollmentRequestController;
+use App\Http\Controllers\StudentAssessmentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -77,13 +78,13 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/lessons/{lesson}', [LessonController::class, 'destroy'])->name('lessons.destroy');
 
         // Assessment management
-        Route::get('/courses/{course}/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
-        Route::get('/courses/{course}/assessments/create', [AssessmentController::class, 'create'])->name('assessments.create');
-        Route::post('/courses/{course}/assessments', [AssessmentController::class, 'store'])->name('assessments.store');
-        Route::get('/courses/{course}/assessments/{assessment}/edit', [AssessmentController::class, 'edit'])->name('assessments.edit');
-        Route::put('/courses/{course}/assessments/{assessment}', [AssessmentController::class, 'update'])->name('assessments.update');
-        Route::delete('/courses/{course}/assessments/{assessment}', [AssessmentController::class, 'destroy'])->name('assessments.destroy');
-        Route::get('/courses/{course}/assessments/{assessment}/results', [AssessmentController::class, 'getResults'])->name('assessments.results');
+        // Route::get('/courses/{course}/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
+        // Route::get('/courses/{course}/assessments/create', [AssessmentController::class, 'create'])->name('assessments.create');
+        // Route::post('/courses/{course}/assessments', [AssessmentController::class, 'store'])->name('assessments.store');
+        // Route::get('/courses/{course}/assessments/{assessment}/edit', [AssessmentController::class, 'edit'])->name('assessments.edit');
+        // Route::put('/courses/{course}/assessments/{assessment}', [AssessmentController::class, 'update'])->name('assessments.update');
+        // Route::delete('/courses/{course}/assessments/{assessment}', [AssessmentController::class, 'destroy'])->name('assessments.destroy');
+        // Route::get('/courses/{course}/assessments/{assessment}/results', [AssessmentController::class, 'getResults'])->name('assessments.results');
     });
 
     // Admin routes
@@ -132,6 +133,21 @@ Route::middleware(['auth', 'role:instructor'])->group(function () {
     Route::get('/instructor/lessons/{lesson}/edit', [LessonController::class, 'edit'])->name('instructor.lessons.edit');
     Route::put('/instructor/lessons/{lesson}', [LessonController::class, 'update'])->name('instructor.lessons.update');
     Route::delete('/instructor/lessons/{lesson}', [LessonController::class, 'destroy'])->name('instructor.lessons.destroy');
+});
+
+// Assessment Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Instructor Assessment Routes
+    Route::post('/courses/{course}/assessments', [AssessmentController::class, 'store'])->name('courses.assessments.store');
+    Route::put('/courses/{course}/assessments/{assessment}', [AssessmentController::class, 'update'])->name('courses.assessments.update');
+    Route::delete('/courses/{course}/assessments/{assessment}', [AssessmentController::class, 'destroy'])->name('courses.assessments.destroy');
+});
+
+// Student Assessment Routes
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/courses/{course}/assessment/take', [StudentAssessmentController::class, 'take'])->name('courses.assessments.take');
+    Route::post('/courses/{course}/assessment/{assessment}/submit', [StudentAssessmentController::class, 'submit'])->name('courses.assessments.submit');
+    Route::get('/courses/{course}/assessment/{assessment}/result', [StudentAssessmentController::class, 'showResult'])->name('courses.assessments.result');
 });
 
 require __DIR__.'/auth.php';

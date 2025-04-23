@@ -151,50 +151,7 @@ class DemoDataSeeder extends Seeder
         }
 
         // Insert sample assessments
-        $assessments = [
-            [
-                'course_id' => 1,
-                'title' => 'React Fundamentals Quiz',
-                'description' => 'Test your understanding of React core concepts',
-                'question_bank' => json_encode([
-                    'questions' => [
-                        [
-                            'question' => 'What is a React component?',
-                            'options' => ['A JavaScript function', 'A CSS file', 'An HTML element', 'A database table'],
-                            'correct' => 0,
-                        ],
-                    ],
-                ]),
-                'time_limit' => 30,
-                'passing_score' => 70,
-                'is_published' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'course_id' => 2,
-                'title' => 'AI Concepts Assessment',
-                'description' => 'Evaluate your understanding of basic AI concepts',
-                'question_bank' => json_encode([
-                    'questions' => [
-                        [
-                            'question' => 'What is machine learning?',
-                            'options' => ['A type of computer hardware', 'A subset of artificial intelligence', 'A programming language', 'A database system'],
-                            'correct' => 1,
-                        ],
-                    ],
-                ]),
-                'time_limit' => 45,
-                'passing_score' => 75,
-                'is_published' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
-
-        foreach ($assessments as $assessment) {
-            DB::table('assessments')->insert($assessment);
-        }
+        
 
         // Insert sample enrollments
         $enrollments = [
@@ -223,29 +180,6 @@ class DemoDataSeeder extends Seeder
         }
 
         // Insert sample assessment results
-        $assessmentResults = [
-            [
-                'user_id' => 1,
-                'assessment_id' => 1,
-                'score' => 85,
-                'feedback' => 'Great understanding of React fundamentals. Focus more on hooks and state management.',
-                'completed_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'assessment_id' => 2,
-                'score' => 92,
-                'feedback' => 'Excellent grasp of AI concepts. Consider exploring advanced topics.',
-                'completed_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
-
-        foreach ($assessmentResults as $result) {
-            DB::table('assessment_results')->insert($result);
-        }
+        
     }
 } 

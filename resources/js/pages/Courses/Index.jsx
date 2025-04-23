@@ -134,9 +134,9 @@ export default function CoursesIndex({ courses, user }) {
                                     <div className="flex items-center mb-4">
                                         <img
                                             className="h-10 w-10 rounded-full"
-                                            src={course.instructor.profile_picture || '/images/default-avatar.png'}
-                                            alt={course.instructor.name}
-                                        />
+                                                src={course.instructor.profile_picture || '/images/default-avatar.png'}
+                                                alt={course.instructor.name}
+                                            />
                                         <div className="ml-3">
                                             <p className="text-sm font-medium text-gray-900">
                                                 {course.instructor.name}

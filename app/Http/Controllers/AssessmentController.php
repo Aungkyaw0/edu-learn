@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
 
 class AssessmentController extends Controller
 {
@@ -27,27 +29,37 @@ class AssessmentController extends Controller
         return response()->json($assessments);
     }
 
-    public function store(Request $request, Course $course): JsonResponse
+    public function create(Course $course)
     {
         $this->authorize('update', $course);
 
+        return Inertia::render('Assessment/Create', [
+            'course' => $course
+        ]);
+    }
+
+    public function store(Request $request, Course $course)
+    {
+        Gate::authorize('update', $course);
+
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'question_bank' => ['required', 'array'],
-            'question_bank.*.question' => ['required', 'string'],
-            'question_bank.*.type' => ['required', 'string', Rule::in(['multiple_choice', 'true_false', 'short_answer', 'essay'])],
-            'question_bank.*.options' => ['required_if:question_bank.*.type,multiple_choice', 'array'],
-            'question_bank.*.correct_answer' => ['required', 'string'],
-            'question_bank.*.points' => ['required', 'integer', 'min:1'],
-            'time_limit' => ['nullable', 'integer', 'min:1'],
-            'passing_score' => ['required', 'integer', 'min:1'],
-            'is_published' => ['boolean'],
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'questions' => 'required|array|size:10',
+            'questions.*.question' => 'required|string',
+            'questions.*.options' => 'required|array|size:4',
+            'questions.*.options.*' => 'required|string',
+            'questions.*.correct_answer' => 'required|integer|min:0|max:3',
         ]);
 
-        $assessment = $course->assessments()->create($validated);
+        // Check if course already has an assessment
+        if ($course->assessment) {
+            return back()->with('error', 'This course already has an assessment.');
+        }
 
-        return response()->json($assessment, 201);
+        $assessment = $course->assessment()->create($validated);
+
+        return back()->with('success', 'Assessment created successfully.');
     }
 
     public function show(Course $course, Assessment $assessment): JsonResponse
@@ -61,36 +73,42 @@ class AssessmentController extends Controller
         return response()->json($assessment);
     }
 
-    public function update(Request $request, Course $course, Assessment $assessment): JsonResponse
+    public function edit(Course $course, Assessment $assessment)
     {
         $this->authorize('update', $course);
+        
+        return Inertia::render('Assessment/Edit', [
+            'course' => $course,
+            'assessment' => $assessment
+        ]);
+    }
+
+    public function update(Request $request, Course $course, Assessment $assessment)
+    {
+        Gate::authorize('update', $course);
 
         $validated = $request->validate([
-            'title' => ['sometimes', 'string', 'max:255'],
-            'description' => ['sometimes', 'string'],
-            'question_bank' => ['sometimes', 'array'],
-            'question_bank.*.question' => ['required_with:question_bank', 'string'],
-            'question_bank.*.type' => ['required_with:question_bank', 'string', Rule::in(['multiple_choice', 'true_false', 'short_answer', 'essay'])],
-            'question_bank.*.options' => ['required_if:question_bank.*.type,multiple_choice', 'array'],
-            'question_bank.*.correct_answer' => ['required_with:question_bank', 'string'],
-            'question_bank.*.points' => ['required_with:question_bank', 'integer', 'min:1'],
-            'time_limit' => ['nullable', 'integer', 'min:1'],
-            'passing_score' => ['sometimes', 'integer', 'min:1'],
-            'is_published' => ['sometimes', 'boolean'],
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'questions' => 'required|array|size:10',
+            'questions.*.question' => 'required|string',
+            'questions.*.options' => 'required|array|size:4',
+            'questions.*.options.*' => 'required|string',
+            'questions.*.correct_answer' => 'required|integer|min:0|max:3',
         ]);
 
         $assessment->update($validated);
 
-        return response()->json($assessment);
+        return back()->with('success', 'Assessment updated successfully.');
     }
 
-    public function destroy(Course $course, Assessment $assessment): JsonResponse
+    public function destroy(Course $course, Assessment $assessment)
     {
-        $this->authorize('update', $course);
+        Gate::authorize('update', $course);
 
         $assessment->delete();
 
-        return response()->json(null, 204);
+        return back()->with('success', 'Assessment deleted successfully.');
     }
 
     public function submit(Request $request, Course $course, Assessment $assessment): JsonResponse

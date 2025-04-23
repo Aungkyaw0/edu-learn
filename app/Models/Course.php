@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Course extends Model
 {
@@ -22,6 +23,7 @@ class Course extends Model
         'instructor_id',
         'price',
         'learning_outcomes',
+        'duration',
     ];
 
     protected $casts = [
@@ -85,6 +87,22 @@ class Course extends Model
     {
         return $this->belongsToMany(User::class, 'enrollment_requests')
                     ->wherePivot('status', 'accepted');
+    }
+
+    /**
+     * Get the lessons for the course.
+     */
+    public function lessons(): HasMany
+    {
+        return $this->hasMany(Lesson::class);
+    }
+
+    /**
+     * Get the assessment for the course.
+     */
+    public function assessment(): HasOne
+    {
+        return $this->hasOne(Assessment::class);
     }
 
     /**

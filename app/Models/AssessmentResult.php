@@ -15,15 +15,14 @@ class AssessmentResult extends Model
         'user_id',
         'answers',
         'score',
-        'feedback',
-        'ai_analysis',
+        'passed',
         'completed_at',
     ];
 
     protected $casts = [
         'answers' => 'array',
-        'score' => 'float',
-        'ai_analysis' => 'array',
+        'score' => 'integer',
+        'passed' => 'boolean',
         'completed_at' => 'datetime',
     ];
 
@@ -38,29 +37,12 @@ class AssessmentResult extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Scopes
-    public function scopePassed($query)
-    {
-        return $query->where('score', '>=', function ($query) {
-            $query->select('passing_score')
-                ->from('assessments')
-                ->whereColumn('id', 'assessment_results.assessment_id');
-        });
-    }
-
-    public function scopeFailed($query)
-    {
-        return $query->where('score', '<', function ($query) {
-            $query->select('passing_score')
-                ->from('assessments')
-                ->whereColumn('id', 'assessment_results.assessment_id');
-        });
-    }
-
     // Helper Methods
-    public function getIsPassingAttribute(): bool
+    public function calculateAndUpdateScore(): void
     {
-        return $this->score >= $this->assessment->passing_score;
+        $this->score = $this->assessment->calculateScore($this->answers);
+        $this->passed = $this->assessment->isPassing($this->score);
+        $this->save();
     }
 
     public function getTimeTakenAttribute(): int
@@ -68,50 +50,43 @@ class AssessmentResult extends Model
         if (!$this->completed_at || !$this->created_at) {
             return 0;
         }
-
         return $this->completed_at->diffInSeconds($this->created_at);
     }
 
     public function getQuestionResultsAttribute(): array
     {
         $results = [];
-        foreach ($this->assessment->question_bank as $question) {
-            $answer = collect($this->answers)->firstWhere('question_id', $question['id']);
+        foreach ($this->assessment->questions as $index => $question) {
+            $studentAnswer = $this->answers[$index] ?? null;
+            $correctAnswerText = isset($question['options'][$question['correct_answer']]) 
+                ? $question['options'][$question['correct_answer']] 
+                : null;
+            
             $results[] = [
-                'question_id' => $question['id'],
                 'question' => $question['question'],
-                'type' => $question['type'],
-                'student_answer' => $answer ? $answer['answer'] : null,
+                'student_answer' => $studentAnswer,
+                'student_answer_text' => isset($studentAnswer) ? $question['options'][$studentAnswer] : null,
                 'correct_answer' => $question['correct_answer'],
-                'points' => $question['points'],
-                'is_correct' => $answer ? $this->isAnswerCorrect($question, $answer['answer']) : false,
+                'correct_answer_text' => $correctAnswerText,
+                'is_correct' => isset($studentAnswer) && $studentAnswer === $question['correct_answer'],
+                'options' => $question['options'],
             ];
         }
         return $results;
     }
 
-    private function isAnswerCorrect(array $question, string $answer): bool
+    public function validateAnswers(): bool
     {
-        if ($question['type'] === 'multiple_choice' || $question['type'] === 'true_false') {
-            return strtolower(trim($answer)) === strtolower(trim($question['correct_answer']));
+        if (!is_array($this->answers) || count($this->answers) !== 10) {
+            return false;
         }
 
-        // For short answer and essay questions, we'll rely on the AI analysis
+        foreach ($this->answers as $answer) {
+            if (!is_int($answer) || $answer < 0 || $answer > 3) {
+                return false;
+            }
+        }
+
         return true;
-    }
-
-    public function getQuestionAnalysis()
-    {
-        return $this->ai_analysis['question_analysis'] ?? [];
-    }
-
-    public function getPerformanceInsights()
-    {
-        return $this->ai_analysis['performance_insights'] ?? [];
-    }
-
-    public function getRecommendedResources()
-    {
-        return $this->ai_analysis['recommended_resources'] ?? [];
     }
 } 
