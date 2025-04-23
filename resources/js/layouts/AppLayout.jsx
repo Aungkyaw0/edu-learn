@@ -55,14 +55,14 @@ export default function AppLayout({ children }) {
                         </div>
                         <div className="hidden sm:ml-6 sm:flex sm:items-center">
                             {auth?.user ? (
-                                <div className="flex items-center space-x-4">
-                                    <span className="text-sm text-gray-700">{auth.user.name}</span>
+                                <div className="flex items-center space-x-4 ">
+                                    <span className="text-sm font-medium text-gray-700">{auth.user.name}</span>
                                     <img
                                         className="h-8 w-8 rounded-full"
                                         src={auth.user.profile_picture || '/images/default-avatar.png'}
                                         alt={auth.user.name}
                                     />
-                                    <Link href={route('logout')} method="post" as="button" className="text-sm text-gray-700 hover:text-gray-900">
+                                    <Link href={route('logout')} method="post" as="button" className="ms-5 text-sm font-medium px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-slate-50 hover:text-slate-20">
                                         Logout
                                     </Link>
                                 </div>

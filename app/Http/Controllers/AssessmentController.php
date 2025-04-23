@@ -12,10 +12,21 @@ use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
+use App\Services\AIAssessmentService;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class AssessmentController extends Controller
 {
     use AuthorizesRequests;
+
+    protected $aiService;
+
+    public function __construct(AIAssessmentService $aiService)
+    {
+        $this->aiService = $aiService;
+    }
+
     public function index(Course $course): JsonResponse
     {
         $this->authorize('view', $course);
@@ -211,5 +222,49 @@ class AssessmentController extends Controller
             'performance_insights' => [],
             'recommended_resources' => [],
         ];
+    }
+
+    public function generateAssessment(Course $course)
+    {
+        try {
+            // Authorize the request
+            Gate::authorize('update', $course);
+
+            // Check if course already has an assessment
+            if ($course->assessment) {
+                return response()->json([
+                    'message' => 'This course already has an assessment.'
+                ], 422);
+            }
+
+            // Collect all lesson content
+            $courseContent = $course->modules->flatMap(function ($module) {
+                return $module->lessons->map(function ($lesson) {
+                    return "Lesson: {$lesson->title}\n{$lesson->content}";
+                });
+            })->join("\n\n");
+
+            // Generate questions using AI
+            $questions = $this->aiService->generateAssessment($courseContent);
+
+            // Create assessment
+            $assessment = Assessment::create([
+                'course_id' => $course->id,
+                'title' => $course->title . ' - Final Assessment',
+                'description' => 'Final assessment for ' . $course->title,
+                'questions' => $questions,
+            ]);
+
+            return back()->with('success', 'Assessment has been generated successfully.');
+        } catch (Exception $e) {
+            Log::error('Assessment Generation Error', [
+                'course_id' => $course->id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'message' => 'Failed to generate assessment. Please try again later.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 } 

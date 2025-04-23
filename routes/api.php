@@ -46,6 +46,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/courses/{course}/assessments', [AssessmentController::class, 'store']);
             Route::put('/assessments/{assessment}', [AssessmentController::class, 'update']);
             Route::delete('/assessments/{assessment}', [AssessmentController::class, 'destroy']);
+            Route::post('/courses/{course}/assessments/generate', [AssessmentController::class, 'generateAssessment'])->name('courses.assessments.generate');
+
         });
 
         // Enrollment routes will be added here

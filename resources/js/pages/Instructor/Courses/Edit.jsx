@@ -14,8 +14,10 @@ export default function EditCourse({ course }) {
     const [selectedModule, setSelectedModule] = useState(null);
     const [selectedLesson, setSelectedLesson] = useState(null);
     const [currentModuleForLesson, setCurrentModuleForLesson] = useState(null);
-    const [showAssessmentModal, setShowAssessmentModal] = useState(false);
+    const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
     const [editingAssessment, setEditingAssessment] = useState(null);
+    const [generatingAssessment, setGeneratingAssessment] = useState(false);
+
 
     const { data, setData, post, put, processing, errors } = useForm({
         title: course.title || '',
@@ -27,39 +29,39 @@ export default function EditCourse({ course }) {
         duration: course.duration || '',
         price: course.price || '',
         is_published: course.is_published || false,
-        _method: 'PUT'
+        _method: 'POST'
     });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
         
-        // Create FormData object
-        const formData = new FormData();
+    //     // Create FormData object
+    //     const formData = new FormData();
         
-        // Append all form fields to FormData
-        Object.keys(data).forEach(key => {
-            if (key === 'learning_outcomes') {
-                // Handle array data
-                data[key].forEach((outcome, index) => {
-                    formData.append(`learning_outcomes[${index}]`, outcome);
-                });
-            } else if (key === 'thumbnail' && data[key] === null) {
-                // Don't append thumbnail if it hasn't changed
-                return;
-            } else {
-                formData.append(key, data[key]);
-            }
-        });
+    //     // Append all form fields to FormData
+    //     Object.keys(data).forEach(key => {
+    //         if (key === 'learning_outcomes') {
+    //             // Handle array data
+    //             data[key].forEach((outcome, index) => {
+    //                 formData.append(`learning_outcomes[${index}]`, outcome);
+    //             });
+    //         } else if (key === 'thumbnail' && data[key] === null) {
+    //             // Don't append thumbnail if it hasn't changed
+    //             return;
+    //         } else {
+    //             formData.append(key, data[key]);
+    //         }
+    //     });
 
-        post(route('instructor.courses.update', course.id), {
-            data: formData,
-            forceFormData: true,
-            onSuccess: () => {
-                router.visit(route('instructor.courses.index'));
-            },
-            preserveFiles: true,
-        });
-    };
+    //     post(route('instructor.courses.update', course.id), {
+    //         data: formData,
+    //         forceFormData: true,
+    //         onSuccess: () => {
+    //             router.visit(route('instructor.courses.index'));
+    //         },
+    //         preserveFiles: true,
+    //     });
+    // };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -128,17 +130,43 @@ export default function EditCourse({ course }) {
 
     const handleCreateAssessment = () => {
         setEditingAssessment(null);
-        setShowAssessmentModal(true);
+        setIsAssessmentModalOpen(true);
     };
 
     const handleEditAssessment = (assessment) => {
         setEditingAssessment(assessment);
-        setShowAssessmentModal(true);
+        setIsAssessmentModalOpen(true);
+    };
+
+    const handleCloseAssessmentModal = () => {
+        setIsAssessmentModalOpen(false);
+        setEditingAssessment(null);
     };
 
     const handleDeleteAssessment = () => {
         if (confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
             router.delete(route('courses.assessments.destroy', [course.id, course.assessment.id]));
+        }
+    };
+
+    const handleGenerateAssessment = (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (confirm('Are you sure you want to generate an AI assessment for this course? This cannot be undone.')) {
+            setGeneratingAssessment(true);
+            post(route('instructor.assessment.generate', course.id), {}, {
+                onSuccess: () => {
+                    alert('Success');
+                    setGeneratingAssessment(false);
+                    window.location.reload();
+                },
+                onError: (errors) => {
+                    setGeneratingAssessment(false);
+                    alert(errors.message || 'Failed to generate assessment. Please try again.');
+                }
+            });
         }
     };
 
@@ -149,172 +177,7 @@ export default function EditCourse({ course }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
                             <h2 className="text-2xl font-semibold mb-6">Edit Course: {course.title}</h2>
-                            <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-                                {/* Course Title */}
-                                <div>
-                                    <InputLabel htmlFor="title" value="Course Title" />
-                                    <TextInput
-                                        id="title"
-                                        type="text"
-                                        value={data.title}
-                                        onChange={e => setData('title', e.target.value)}
-                                        className="mt-1 block w-full"
-                                    />
-                                    <InputError message={errors.title} className="mt-2" />
-                                </div>
-
-                                {/* Description */}
-                                <div>
-                                    <InputLabel htmlFor="description" value="Description" />
-                                    <textarea
-                                        id="description"
-                                        value={data.description}
-                                        onChange={e => setData('description', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                        rows={4}
-                                    />
-                                    <InputError message={errors.description} className="mt-2" />
-                                </div>
-
-                                {/* Category */}
-                                <div>
-                                    <InputLabel htmlFor="category" value="Category" />
-                                    <TextInput
-                                        id="category"
-                                        type="text"
-                                        value={data.category}
-                                        onChange={e => setData('category', e.target.value)}
-                                        className="mt-1 block w-full"
-                                        placeholder="Enter course category"
-                                    />
-                                    <InputError message={errors.category} className="mt-2" />
-                                </div>
-
-                                {/* Duration */}
-                                <div>
-                                    <InputLabel htmlFor="duration" value="Duration (hours)" />
-                                    <TextInput
-                                        id="duration"
-                                        type="number"
-                                        min="1"
-                                        value={data.duration}
-                                        onChange={e => setData('duration', e.target.value)}
-                                        className="mt-1 block w-full"
-                                    />
-                                    <InputError message={errors.duration} className="mt-2" />
-                                </div>
-
-                                {/* Price */}
-                                <div>
-                                    <InputLabel htmlFor="price" value="Price ($)" />
-                                    <TextInput
-                                        id="price"
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={data.price}
-                                        onChange={e => setData('price', e.target.value)}
-                                        className="mt-1 block w-full"
-                                    />
-                                    <InputError message={errors.price} className="mt-2" />
-                                </div>
-
-                                {/* Thumbnail */}
-                                <div>
-                                    <InputLabel htmlFor="thumbnail" value="Course Thumbnail" />
-                                    <div className="mt-2 flex items-center">
-                                        <div className="flex-shrink-0">
-                                            <img
-                                                src={selectedImage || '/images/default-course.jpg'}
-                                                alt="Course thumbnail preview"
-                                                className="h-32 w-32 object-cover rounded-lg"
-                                            />
-                                        </div>
-                                        <input
-                                            type="file"
-                                            onChange={handleImageChange}
-                                            className="ml-5 rounded-md border border-gray-300 bg-white py-2 px-3 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                            accept="image/*"
-                                        />
-                                    </div>
-                                    <InputError message={errors.thumbnail} className="mt-2" />
-                                </div>
-
-                                {/* Learning Outcomes */}
-                                <div>
-                                    <div className="flex justify-between items-center mb-4">
-                                        <InputLabel value="Learning Outcomes" />
-                                        <button
-                                            type="button"
-                                            onClick={addLearningOutcome}
-                                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                                        >
-                                            Add Outcome
-                                        </button>
-                                    </div>
-                                    {data.learning_outcomes && data.learning_outcomes.map((outcome, index) => (
-                                        <div key={index} className="flex gap-2 mb-2">
-                                            <TextInput
-                                                value={outcome}
-                                                onChange={e => updateLearningOutcome(index, e.target.value)}
-                                                className="flex-1"
-                                                placeholder={`Learning outcome ${index + 1}`}
-                                            />
-                                            {data.learning_outcomes.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeLearningOutcome(index)}
-                                                    className="px-2 py-1 text-red-600 hover:text-red-800"
-                                                >
-                                                    Remove
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
-                                    <InputError message={errors.learning_outcomes} className="mt-2" />
-                                </div>
-
-                                {/* Difficulty Level */}
-                                <div>
-                                    <InputLabel htmlFor="difficulty_level" value="Difficulty Level" />
-                                    <select
-                                        id="difficulty_level"
-                                        value={data.difficulty_level}
-                                        onChange={e => setData('difficulty_level', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                    >
-                                        <option value="beginner">Beginner</option>
-                                        <option value="intermediate">Intermediate</option>
-                                        <option value="advanced">Advanced</option>
-                                    </select>
-                                    <InputError message={errors.difficulty_level} className="mt-2" />
-                                </div>
-
-                                {/* Published Status */}
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="is_published"
-                                        checked={data.is_published}
-                                        onChange={e => setData('is_published', e.target.checked)}
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <label htmlFor="is_published" className="ml-2 block text-sm text-gray-900">
-                                        Publish this course
-                                    </label>
-                                </div>
-
-                                {/* Submit Button */}
-                                <div className="flex justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                    >
-                                        {processing ? 'Saving...' : 'Save Changes'}
-                                    </button>
-                                </div>
-                            </form>
+                            
                         </div>
                     </div>
 
@@ -324,6 +187,7 @@ export default function EditCourse({ course }) {
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-semibold text-gray-900">Course Modules</h3>
                                 <button
+                                    type="button"
                                     onClick={() => openModuleModal()}
                                     className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700"
                                 >
@@ -402,55 +266,57 @@ export default function EditCourse({ course }) {
                         </div>
                     </div>
 
-                    {/* Assessment Section */}
+                    {/* Assessment Section - Moved outside the form */}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6">
                         <div className="p-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-semibold text-gray-900">Final Assessment</h2>
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-lg font-medium text-gray-900">Final Assessment</h2>
                                 {!course.assessment ? (
-                                    <button
-                                        onClick={handleCreateAssessment}
-                                        className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                    >
-                                        <PlusIcon className="w-4 h-4 mr-2" />
-                                        Create Assessment
-                                    </button>
-                                ) : (
-                                    <div className="flex space-x-2">
+                                    <div className="flex space-x-4">
                                         <button
-                                            onClick={() => handleEditAssessment(course.assessment)}
-                                            className="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                            type="button"
+                                            onClick={handleGenerateAssessment}
+                                            disabled={generatingAssessment}
+                                            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 disabled:opacity-50"
                                         >
-                                            <PencilIcon className="w-4 h-4 mr-2" />
+                                            {generatingAssessment ? 'Generating...' : 'Generate Assessment'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={handleCreateAssessment}
+                                            className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        >
+                                            Create Assessment
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex space-x-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleEditAssessment(course.assessment)}
+                                            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        >
                                             Edit Assessment
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={handleDeleteAssessment}
-                                            className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                            className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150"
                                         >
-                                            <TrashIcon className="w-4 h-4 mr-2" />
                                             Delete Assessment
                                         </button>
                                     </div>
                                 )}
                             </div>
 
-                            {course.assessment ? (
-                                <div className="border-t pt-4">
-                                    <h3 className="font-medium text-lg mb-2">{course.assessment.title}</h3>
-                                    <p className="text-gray-600 mb-4">{course.assessment.description}</p>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <h4 className="font-medium mb-2">Assessment Details:</h4>
-                                        <ul className="list-disc list-inside text-gray-600 space-y-1">
-                                            <li>10 Multiple Choice Questions</li>
-                                            <li>Passing Score: 8/10</li>
-                                            <li>No time limit</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-gray-600">
-                                    No assessment has been created for this course yet. Create one to test your students' knowledge.
+                            {course.assessment && (
+                                <div className="mt-4">
+                                    <p className="text-sm text-gray-600">
+                                        Assessment Title: {course.assessment.title}
+                                    </p>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        Number of Questions: {course.assessment.questions.length}
+                                    </p>
                                 </div>
                             )}
                         </div>
@@ -474,11 +340,8 @@ export default function EditCourse({ course }) {
                 />
             )}
             <AssessmentModal
-                show={showAssessmentModal}
-                onClose={() => {
-                    setShowAssessmentModal(false);
-                    setEditingAssessment(null);
-                }}
+                show={isAssessmentModalOpen}
+                onClose={handleCloseAssessmentModal}
                 course={course}
                 assessment={editingAssessment}
             />
