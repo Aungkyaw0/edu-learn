@@ -1,5 +1,6 @@
 import LoginModal from '@/Components/Auth/LoginModal';
 import RegisterModal from '@/Components/Auth/RegisterModal';
+import EditProfileModal from '@/Components/Profile/EditProfileModal';
 import FlashMessage from '@/Components/FlashMessage';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -8,6 +9,7 @@ export default function AppLayout({ children }) {
     const { auth } = usePage().props;
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -55,14 +57,36 @@ export default function AppLayout({ children }) {
                         </div>
                         <div className="hidden sm:ml-6 sm:flex sm:items-center">
                             {auth?.user ? (
-                                <div className="flex items-center space-x-4 ">
-                                    <span className="text-sm font-medium text-gray-700">{auth.user.name}</span>
-                                    <img
-                                        className="h-8 w-8 rounded-full"
-                                        src={auth.user.profile_picture || '/images/default-avatar.png'}
-                                        alt={auth.user.name}
-                                    />
-                                    <Link href={route('logout')} method="post" as="button" className="ms-5 text-sm font-medium px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-slate-50 hover:text-slate-20">
+                                <div className="flex items-center space-x-4">
+                                    {/* <button
+                                        onClick={() => setIsProfileModalOpen(true)}
+                                        className="flex items-center space-x-3 hover:opacity-80"
+                                    >
+                                        <span className="text-sm font-medium text-gray-700">{auth.user.name}</span>
+                                        <img
+                                            className="h-8 w-8 rounded-full object-cover"
+                                            src={auth.user.profile_picture || '/images/default-avatar.png'}
+                                            alt={auth.user.name}
+                                        />
+                                    </button> */}
+                                    <Link
+                                        href={route('profile.edit')}
+                                        method="get"
+                                        className="flex items-center space-x-3 hover:opacity-80"
+                                    >
+                                        <span className="text-sm font-medium text-gray-700">{auth.user.name}</span>
+                                        <img
+                                            className="h-8 w-8 rounded-full object-cover"
+                                            src={auth.user.profile_picture || '/images/default-avatar.png'}
+                                            alt={auth.user.name}
+                                        />
+                                    </Link>
+                                    <Link
+                                        href={route('logout')}
+                                        method="post"
+                                        as="button"
+                                        className="ms-5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-slate-50 hover:bg-indigo-700 hover:text-slate-20"
+                                    >
                                         Logout
                                     </Link>
                                 </div>
@@ -105,6 +129,12 @@ export default function AppLayout({ children }) {
                     setIsRegisterModalOpen(false);
                     setIsLoginModalOpen(true);
                 }}
+            />
+
+            <EditProfileModal
+                isOpen={isProfileModalOpen}
+                onClose={() => setIsProfileModalOpen(false)}
+                user={auth?.user}
             />
         </div>
     );
