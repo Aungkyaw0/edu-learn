@@ -19,8 +19,8 @@ class CourseController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        $courses = Course::with(['instructor'])
-            ->withCount('enrollments')
+        $courses = Course::with('instructor')
+            ->orderBy('created_at', 'desc')
             ->paginate(9);
 
         return Inertia::render('Courses/Index', [

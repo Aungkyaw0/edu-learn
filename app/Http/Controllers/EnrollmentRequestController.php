@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\EnrollmentRequest;
 use App\Models\Enrollment;
+use App\Services\CourseRecommendationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -13,6 +14,13 @@ class EnrollmentRequestController extends Controller
 {
     use AuthorizesRequests;
 
+    private CourseRecommendationService $recommendationService;
+
+    public function __construct(CourseRecommendationService $recommendationService)
+    {
+        $this->recommendationService = $recommendationService;
+    }
+
     public function myLearning()
     {
         $enrollmentRequests = EnrollmentRequest::with(['course', 'course.instructor'])
@@ -20,10 +28,13 @@ class EnrollmentRequestController extends Controller
             ->get()
             ->groupBy('status');
 
+        $recommendedCourses = $this->recommendationService->getRecommendedCourses(auth()->user(), 6);
+
         return Inertia::render('Student/MyLearning', [
             'enrolledCourses' => $enrollmentRequests['accepted'] ?? [],
             'pendingRequests' => $enrollmentRequests['pending'] ?? [],
-            'rejectedRequests' => $enrollmentRequests['rejected'] ?? []
+            'rejectedRequests' => $enrollmentRequests['rejected'] ?? [],
+            'recommendedCourses' => $recommendedCourses
         ]);
     }
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import RecommendedCourses from '@/Components/Courses/RecommendedCourses';
 
-export default function Home() {
+export default function Home({ auth, recommendedCourses }) {
     return (
         <AppLayout>
             <Head title="Home" />
@@ -134,6 +135,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+                <RecommendedCourses courses={recommendedCourses} />    
 
             {/* Featured Courses Section
             {featuredCourses && featuredCourses.length > 0 && (

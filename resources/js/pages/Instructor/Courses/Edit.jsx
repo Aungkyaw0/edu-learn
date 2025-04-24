@@ -132,7 +132,7 @@ export default function EditCourse({ course }) {
                                         Delete Course
                                     </button>
                                 </div>
-                            </div>
+                                </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -141,16 +141,16 @@ export default function EditCourse({ course }) {
                                         <div>
                                             <h4 className="text-sm font-medium text-gray-500">Title</h4>
                                             <p className="mt-1">{course.title}</p>
-                                        </div>
-                                        <div>
+                                </div>
+                                <div>
                                             <h4 className="text-sm font-medium text-gray-500">Description</h4>
                                             <p className="mt-1">{course.description}</p>
-                                        </div>
-                                        <div>
+                                </div>
+                                <div>
                                             <h4 className="text-sm font-medium text-gray-500">Category</h4>
                                             <p className="mt-1">{course.category}</p>
-                                        </div>
-                                        <div>
+                                </div>
+                                <div>
                                             <h4 className="text-sm font-medium text-gray-500">Difficulty Level</h4>
                                             <p className="mt-1 capitalize">{course.difficulty_level}</p>
                                         </div>
@@ -167,7 +167,7 @@ export default function EditCourse({ course }) {
                                         <div>
                                             <h4 className="text-sm font-medium text-gray-500">Price</h4>
                                             <p className="mt-1">${course.price}</p>
-                                        </div>
+                                    </div>
                                         <div>
                                             <h4 className="text-sm font-medium text-gray-500">Status</h4>
                                             <p className="mt-1">
@@ -180,7 +180,7 @@ export default function EditCourse({ course }) {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                </div>
 
                             {course.thumbnail && (
                                 <div className="mt-6">
@@ -202,7 +202,7 @@ export default function EditCourse({ course }) {
                                         <li className="text-gray-500">No learning outcomes defined</li>
                                     )}
                                 </ul>
-                            </div>
+                                </div>
                         </div>
                     </div>
 
@@ -298,12 +298,12 @@ export default function EditCourse({ course }) {
                                 <h2 className="text-lg font-medium text-gray-900">Final Assessment</h2>
                                 {!course.assessment ? (
                                     <div className="flex space-x-4">
-                                        <button
+                                    <button
                                             type="button"
-                                            onClick={handleGenerateAssessment}
+                                        onClick={handleGenerateAssessment}
                                             disabled={generatingAssessment}
-                                            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 disabled:opacity-50"
-                                        >
+                                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 disabled:opacity-50"
+                                    >
                                             {generatingAssessment ? 'Generating...' : 'Generate Assessment'}
                                         </button>
                                         <button
@@ -312,17 +312,17 @@ export default function EditCourse({ course }) {
                                             className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150"
                                         >
                                             Create Assessment
-                                        </button>
+                                    </button>
                                     </div>
                                 ) : (
                                     <div className="flex space-x-4">
-                                        <button
+                                    <button
                                             type="button"
                                             onClick={() => handleEditAssessment(course.assessment)}
-                                            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                        >
-                                            Edit Assessment
-                                        </button>
+                                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    >
+                                        Edit Assessment
+                                    </button>
                                         <button
                                             type="button"
                                             onClick={handleDeleteAssessment}

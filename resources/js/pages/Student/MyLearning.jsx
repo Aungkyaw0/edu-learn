@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, Head, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import RecommendedCourses from '@/Components/Courses/RecommendedCourses';
 
-export default function MyLearning({ enrolledCourses, pendingRequests, rejectedRequests }) {
+export default function MyLearning({ enrolledCourses, pendingRequests, rejectedRequests, recommendedCourses }) {
     const handleStartLearning = (courseId) => {
         router.get(route('student.course.learn', courseId));
     };
@@ -148,6 +149,8 @@ export default function MyLearning({ enrolledCourses, pendingRequests, rejectedR
                             </div>
                         </div>
                     )}
+
+                    <RecommendedCourses courses={recommendedCourses} />
                 </div>
             </div>
         </AppLayout>

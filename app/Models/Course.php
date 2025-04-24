@@ -23,6 +23,7 @@ class Course extends Model
         'instructor_id',
         'price',
         'metadata',
+        'duration',
     ];
 
     protected $casts = [
@@ -119,5 +120,4 @@ class Course extends Model
     {
         return $query->where('difficulty_level', $level);
     }
-
 }

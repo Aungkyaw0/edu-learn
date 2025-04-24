@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import Pagination from '@/Components/Pagination';
 
 export default function CoursesIndex({ courses, user }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -191,6 +192,12 @@ export default function CoursesIndex({ courses, user }) {
                             </p>
                         </div>
                     )}
+                    {console.log(courses)}
+                    {/* Pagination */}
+                        <div className="mt-8">
+                            <Pagination links={courses.links} />
+                        </div>
+                    
                 </div>
             </div>
         </AppLayout>
