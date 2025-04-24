@@ -11,7 +11,7 @@ use App\Http\Controllers\EnrollmentRequestController;
 use App\Http\Controllers\StudentAssessmentController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
-
+use App\Http\Controllers\ChatBotController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -41,6 +41,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('/chatbot', [ChatBotController::class, 'chat'])->name('chatbot.chat');
 });
 
 // Course routes

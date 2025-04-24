@@ -14,6 +14,13 @@ return [
     |
     */
 
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
+        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+        'scheme' => 'https',
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
@@ -38,6 +45,11 @@ return [
     'openrouter' => [
         'key' => env('OPENROUTER_API_KEY'),
         'verify_ssl' => env('OPENROUTER_VERIFY_SSL', false),
+    ],
+
+    'ai' => [
+        'api_key' => env('AI_API_KEY'),
+        'api_endpoint' => env('AI_API_ENDPOINT', 'https://api.chutesai.com/v1/chat/completions'),
     ],
 
 ];

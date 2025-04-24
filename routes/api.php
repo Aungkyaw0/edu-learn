@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\AssessmentController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\ChatBotController;
 
 Route::prefix('v1')->group(function () {
     // Public routes
@@ -13,6 +15,9 @@ Route::prefix('v1')->group(function () {
     // Public course routes
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{course}', [CourseController::class, 'show']);
+
+    // Chatbot route (public)
+    Route::post('/chatbot', [ChatBotController::class, 'chat']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -52,4 +57,4 @@ Route::prefix('v1')->group(function () {
 
         // Enrollment routes will be added here
     });
-}); 
+});

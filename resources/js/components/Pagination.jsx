@@ -13,7 +13,7 @@ export default function Pagination({ links = [] }) {
                     return (
                         <span
                             key={key}
-                            className="px-4 py-2 text-gray-500 bg-gray-100 rounded-md cursor-not-allowed"
+                            className="px-4 py-2 text-gray-500 bg-green-500 rounded-md cursor-not-allowed"
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     );

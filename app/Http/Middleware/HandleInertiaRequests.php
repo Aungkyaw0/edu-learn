@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
+                'chat_response' => fn () => $request->session()->get('chat_response'),
             ],
             'csrf_token' => csrf_token(),
             'ziggy' => fn (): array => [

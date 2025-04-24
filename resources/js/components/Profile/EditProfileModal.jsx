@@ -58,13 +58,13 @@ export default function EditProfileModal({ isOpen, onClose, user }) {
         }
 
         // Log the form data for debugging
-        console.log('Form Data:', {
-            name: data.name,
-            email: data.email,
-            bio: data.bio,
-            preferences: data.preferences,
-            profile_picture: data.profile_picture
-        });
+        // console.log('Form Data:', {
+        //     name: data.name,
+        //     email: data.email,
+        //     bio: data.bio,
+        //     preferences: data.preferences,
+        //     profile_picture: data.profile_picture
+        // });
 
         patch(route('profile.update'), {
             data: formData,
@@ -111,9 +111,9 @@ export default function EditProfileModal({ isOpen, onClose, user }) {
     };
 
     // Add debug output for initial data
-    useEffect(() => {
-        console.log('Current form data:', data);
-    }, [data]);
+    // useEffect(() => {
+    //     console.log('Current form data:', data);
+    // }, [data]);
 
     return (
         <Modal show={isOpen} onClose={onClose}>

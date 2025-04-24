@@ -4,6 +4,7 @@ import EditProfileModal from '@/Components/Profile/EditProfileModal';
 import FlashMessage from '@/Components/FlashMessage';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import ChatBot from '@/Components/ChatBot';
 
 export default function AppLayout({ children }) {
     const { auth } = usePage().props;
@@ -112,6 +113,8 @@ export default function AppLayout({ children }) {
                 <FlashMessage />
                 {children}
             </main>
+
+            <ChatBot />
 
             <LoginModal
                 isOpen={isLoginModalOpen}
