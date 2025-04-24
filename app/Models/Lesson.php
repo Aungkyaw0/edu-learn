@@ -17,14 +17,14 @@ class Lesson extends Model
         'duration',
         'order_index',
         'resources',
-        'metadata'
+        'metadata',
     ];
 
     protected $casts = [
         'duration' => 'integer',
         'order_index' => 'integer',
-        'resources' => 'array',
-        'metadata' => 'json'
+        'resources' => 'json',
+        'metadata' => 'json',
     ];
 
     public function module(): BelongsTo

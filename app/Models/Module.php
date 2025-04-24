@@ -23,7 +23,7 @@ class Module extends Model
 
     protected $casts = [
         'order_index' => 'integer',
-        'resources' => 'array',
+        'resources' => 'json',
         'metadata' => 'json',
     ];
 

@@ -11,13 +11,13 @@ export default function EditProfileModal({ isOpen, onClose, user }) {
         email: user?.email || '',
         bio: user?.bio || '',
         profile_picture: null,
-        preferences: user?.preferences || {
-            email_notifications: true,
-            language: 'en',
-            theme: 'light',
-            learning_style: 'visual',
-            difficulty_preference: 'balanced',
-            interests: [],
+        preferences: {
+            email_notifications: user?.preferences?.email_notifications ?? true,
+            language: user?.preferences?.language ?? 'en',
+            theme: user?.preferences?.theme ?? 'light',
+            learning_style: user?.preferences?.learning_style ?? 'visual',
+            difficulty_preference: user?.preferences?.difficulty_preference ?? 'balanced',
+            interests: user?.preferences?.interests ?? [],
         },
     });
 
@@ -29,13 +29,13 @@ export default function EditProfileModal({ isOpen, onClose, user }) {
                 email: user.email || '',
                 bio: user.bio || '',
                 profile_picture: null,
-                preferences: user.preferences || {
-                    email_notifications: true,
-                    language: 'en',
-                    theme: 'light',
-                    learning_style: 'visual',
-                    difficulty_preference: 'balanced',
-                    interests: [],
+                preferences: {
+                    email_notifications: user.preferences?.email_notifications ?? true,
+                    language: user.preferences?.language ?? 'en',
+                    theme: user.preferences?.theme ?? 'light',
+                    learning_style: user.preferences?.learning_style ?? 'visual',
+                    difficulty_preference: user.preferences?.difficulty_preference ?? 'balanced',
+                    interests: user.preferences?.interests ?? [],
                 },
             });
             setImagePreview(user.profile_picture || '/images/default-avatar.png');
@@ -102,10 +102,10 @@ export default function EditProfileModal({ isOpen, onClose, user }) {
     };
 
     const handleInterestChange = (interest) => {
-        const interests = data.preferences.interests || [];
-        const updatedInterests = interests.includes(interest)
-            ? interests.filter(i => i !== interest)
-            : [...interests, interest];
+        const currentInterests = data.preferences?.interests ?? [];
+        const updatedInterests = currentInterests.includes(interest)
+            ? currentInterests.filter(i => i !== interest)
+            : [...currentInterests, interest];
         
         handlePreferenceChange('interests', updatedInterests);
     };
@@ -295,7 +295,7 @@ export default function EditProfileModal({ isOpen, onClose, user }) {
                                         <input
                                             type="checkbox"
                                             id={`interest-${interest}`}
-                                            checked={data.preferences.interests.includes(interest)}
+                                            checked={data.preferences?.interests?.includes(interest) ?? false}
                                             onChange={() => handleInterestChange(interest)}
                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                         />

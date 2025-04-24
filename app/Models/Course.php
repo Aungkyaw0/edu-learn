@@ -22,14 +22,13 @@ class Course extends Model
         'is_published',
         'instructor_id',
         'price',
-        'learning_outcomes',
-        'duration',
+        'metadata',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
         'price' => 'decimal:2',
-        'learning_outcomes' => 'array',
+        'metadata' => 'json',
     ];
 
     /**
