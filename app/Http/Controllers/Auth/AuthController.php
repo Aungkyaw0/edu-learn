@@ -14,12 +14,12 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return Inertia::render('auth/Login');
+        return Inertia::render('Home');
     }
 
     public function showRegisterForm()
     {
-        return Inertia::render('auth/Register');
+        return Inertia::render('Home');
     }
 
     public function login(Request $request)

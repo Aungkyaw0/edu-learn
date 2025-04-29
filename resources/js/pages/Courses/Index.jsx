@@ -192,7 +192,7 @@ export default function CoursesIndex({ courses, user }) {
                             </p>
                         </div>
                     )}
-                    {console.log(courses)}
+                    
                     {/* Pagination */}
                         <div className="mt-8">
                             <Pagination links={courses.links} />

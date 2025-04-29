@@ -135,42 +135,134 @@ export default function Home({ auth, recommendedCourses }) {
                     </div>
                 </div>
             </div>
-                <RecommendedCourses courses={recommendedCourses} />    
 
-            {/* Featured Courses Section
-            {featuredCourses && featuredCourses.length > 0 && (
-                <div className="bg-gray-50 py-12">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center">
-                            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                                Featured Courses
-                            </h2>
-                            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-                                Explore our most popular courses and start your learning journey today.
-                            </p>
-                        </div>
-
-                        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {featuredCourses.map((course) => (
-                                <div key={course.id} className="bg-white overflow-hidden shadow rounded-lg">
-                                    <div className="px-4 py-5 sm:p-6">
-                                        <h3 className="text-lg font-medium text-gray-900">{course.title}</h3>
-                                        <p className="mt-1 text-sm text-gray-500">{course.description}</p>
-                                        <div className="mt-4">
-                                            <Link
-                                                href={`/courses/${course.id}`}
-                                                className="text-indigo-600 hover:text-indigo-500"
-                                            >
-                                                Learn more →
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+            {/* Learning Statistics Section */}
+            <div className="bg-indigo-50 py-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                            Our Impact
+                        </h2>
+                        <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                            Join thousands of learners who have transformed their education journey with EduLearn.
+                        </p>
+                    </div>
+                    <div className="mt-10">
+                        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="bg-white p-6 rounded-lg shadow-lg">
+                                <div className="text-4xl font-bold text-indigo-600">10,000+</div>
+                                <div className="mt-2 text-lg font-medium text-gray-900">Active Learners</div>
+                                <p className="mt-1 text-sm text-gray-500">Engaged in personalized learning paths</p>
+                            </div>
+                            <div className="bg-white p-6 rounded-lg shadow-lg">
+                                <div className="text-4xl font-bold text-indigo-600">95%</div>
+                                <div className="mt-2 text-lg font-medium text-gray-900">Success Rate</div>
+                                <p className="mt-1 text-sm text-gray-500">Of students achieving their learning goals</p>
+                            </div>
+                            <div className="bg-white p-6 rounded-lg shadow-lg">
+                                <div className="text-4xl font-bold text-indigo-600">500+</div>
+                                <div className="mt-2 text-lg font-medium text-gray-900">Courses</div>
+                                <p className="mt-1 text-sm text-gray-500">Covering diverse subjects and skills</p>
+                            </div>
+                            <div className="bg-white p-6 rounded-lg shadow-lg">
+                                <div className="text-4xl font-bold text-indigo-600">24/7</div>
+                                <div className="mt-2 text-lg font-medium text-gray-900">AI Support</div>
+                                <p className="mt-1 text-sm text-gray-500">Personalized assistance available anytime</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            )} */}
+            </div>
+
+            {/* Testimonials Section */}
+            <div className="bg-white py-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                            What Our Learners Say
+                        </h2>
+                        <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                            Hear from students who have experienced the power of AI-driven education.
+                        </p>
+                    </div>
+                    <div className="mt-10">
+                        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="bg-gray-50 p-6 rounded-lg">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <img className="h-12 w-12 rounded-full" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Sarah Johnson" />
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="text-lg font-medium text-gray-900">Sarah Johnson</div>
+                                        <div className="text-sm text-indigo-600">Data Science Student</div>
+                                    </div>
+                                </div>
+                                <p className="mt-4 text-gray-500">
+                                    "The AI-powered recommendations helped me discover courses I never would have considered. It's like having a personal learning coach!"
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-lg">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <img className="h-12 w-12 rounded-full" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Michael Chen" />
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="text-lg font-medium text-gray-900">Michael Chen</div>
+                                        <div className="text-sm text-indigo-600">Web Development Student</div>
+                                    </div>
+                                </div>
+                                <p className="mt-4 text-gray-500">
+                                    "The instant feedback on my coding exercises has been invaluable. I can see my progress in real-time and improve faster."
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-lg">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <img className="h-12 w-12 rounded-full" src="https://randomuser.me/api/portraits/women/2.jpg" alt="Emma Rodriguez" />
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="text-lg font-medium text-gray-900">Emma Rodriguez</div>
+                                        <div className="text-sm text-indigo-600">Business Analytics Student</div>
+                                    </div>
+                                </div>
+                                <p className="mt-4 text-gray-500">
+                                    "The adaptive learning system really understands my strengths and weaknesses. It's made learning complex topics much more manageable."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Call to Action Section */}
+            <div className="bg-indigo-700">
+                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+                    <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                        <span className="block">Ready to transform your learning experience?</span>
+                        <span className="block text-indigo-200">Start your journey today.</span>
+                    </h2>
+                    <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+                        <div className="inline-flex rounded-md shadow">
+                            <Link
+                                href="/register"
+                                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50"
+                            >
+                                Get started
+                            </Link>
+                        </div>
+                        <div className="ml-3 inline-flex rounded-md shadow">
+                            <Link
+                                href="/courses"
+                                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                            >
+                                Browse courses
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <RecommendedCourses courses={recommendedCourses} />
         </AppLayout>
     );
 } 

@@ -1,7 +1,7 @@
 import { InputError, InputLabel, TextInput } from '@/Components/Forms';
 import Modal from '@/Components/Modal';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 export default function CourseModal({ show, onClose, course }) {
